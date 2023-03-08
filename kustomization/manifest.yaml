@@ -26,15 +26,6 @@ metadata:
 type: Opaque
 ---
 apiVersion: v1
-data:
-  .dockerconfigjson: ewogICJhdXRocyI6IHsKICAgICJkZXZvcHMuaXNzLWFnLmNoOjUwNTAiOiB7CiAgICAgICJ1c2VybmFtZSI6ICJrOHMtdHJhaW5pbmciLAogICAgICAicGFzc3dvcmQiOiAiZE1yblcxd2dpM0U2S3V1MjFzdnQiLAogICAgICAiZW1haWwiOiAiZGF2aWQuYWxicmVjaHRAaXNzLWFnLmNoIiwKICAgICAgImF1dGgiOiAiYXpoekxYUnlZV2x1YVc1bk9tUk5jbTVYTVhkbmFUTkZOa3QxZFRJeGMzWjAiCiAgICB9CiAgfQp9Cg==
-kind: Secret
-metadata:
-  name: k8s-training-credentials
-  namespace: training
-type: kubernetes.io/dockerconfigjson
----
-apiVersion: v1
 kind: Service
 metadata:
   name: hello-world
@@ -72,7 +63,7 @@ spec:
             secretKeyRef:
               key: basic-auth-password
               name: basic-auth
-        image: lilbitsquishy/teko:1
+        image: lilbitsquishy/teko:2
         imagePullPolicy: IfNotPresent
         name: hello-world
         ports:

@@ -3,12 +3,11 @@ kind: Kustomization
 
 images:
 - name: lilbitsquishy/teko
-  newTag: 001
+  newTag: 2
 resources:
 - deployment.yaml
 - service.yaml
 - secret.yaml
 - configmap.yaml
-- imagePullSecrets.yaml
 - namespace.yaml
 - ingress.yaml
