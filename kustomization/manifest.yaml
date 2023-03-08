@@ -1,0 +1,126 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: training
+---
+apiVersion: v1
+data:
+  hello.txt: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis suscipit,
+    felis a auctor fermentum, erat risus lobortis velit, vitae venenatis odio mi ac
+    enim. Praesent dictum metus eget semper pellentesque. Duis euismod feugiat nisi,
+    sit amet rhoncus purus placerat ut. Maecenas vel varius quam, nec finibus ante.
+    Nam elit dui, fermentum ac dui tempus, condimentum rhoncus lectus. Vestibulum
+    et nunc aliquet neque convallis egestas. Duis eu rhoncus nisl.
+kind: ConfigMap
+metadata:
+  name: message-file
+  namespace: training
+---
+apiVersion: v1
+data:
+  basic-auth-password: YWRtaW4=
+kind: Secret
+metadata:
+  name: basic-auth
+  namespace: training
+type: Opaque
+---
+apiVersion: v1
+data:
+  .dockerconfigjson: ewogICJhdXRocyI6IHsKICAgICJkZXZvcHMuaXNzLWFnLmNoOjUwNTAiOiB7CiAgICAgICJ1c2VybmFtZSI6ICJrOHMtdHJhaW5pbmciLAogICAgICAicGFzc3dvcmQiOiAiZE1yblcxd2dpM0U2S3V1MjFzdnQiLAogICAgICAiZW1haWwiOiAiZGF2aWQuYWxicmVjaHRAaXNzLWFnLmNoIiwKICAgICAgImF1dGgiOiAiYXpoekxYUnlZV2x1YVc1bk9tUk5jbTVYTVhkbmFUTkZOa3QxZFRJeGMzWjAiCiAgICB9CiAgfQp9Cg==
+kind: Secret
+metadata:
+  name: k8s-training-credentials
+  namespace: training
+type: kubernetes.io/dockerconfigjson
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-world
+  namespace: training
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 8000
+  selector:
+    app: hello-world
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-world
+  namespace: training
+spec:
+  replicas: 1
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels:
+      app: hello-world
+  template:
+    metadata:
+      labels:
+        app: hello-world
+    spec:
+      containers:
+      - env:
+        - name: USERNAME
+          value: admin
+        - name: PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: basic-auth-password
+              name: basic-auth
+        image: lilbitsquishy/teko:1
+        imagePullPolicy: IfNotPresent
+        name: hello-world
+        ports:
+        - containerPort: 8000
+        resources:
+          limits:
+            cpu: 250m
+            memory: 250Mi
+          requests:
+            cpu: 250m
+            memory: 250Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - all
+          readOnlyRootFilesystem: true
+        volumeMounts:
+        - mountPath: /tmp/hello.txt
+          name: message-file-config
+          subPath: hello.txt
+      securityContext:
+        fsGroup: 2000
+        runAsGroup: 3000
+        runAsUser: 11000
+        seccompProfile:
+          type: RuntimeDefault
+      volumes:
+      - configMap:
+          name: message-file
+        name: message-file-config
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: traefik
+  name: hello-world
+  namespace: training
+spec:
+  rules:
+  - host: k8straining.helloworld.iss
+    http:
+      paths:
+      - backend:
+          service:
+            name: hello-world-service
+            port:
+              number: 80
+        path: /
+        pathType: Prefix
