@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-world
+  namespace: training
+spec:
+  replicas: 1
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels:
+      app: hello-world
+  template:
+    metadata:
+      labels:
+        app: hello-world
+    spec:
+      securityContext:
+        runAsUser: 11000
+        runAsGroup: 3000
+        fsGroup: 2000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: hello-world
+          image: lilbitsquishy/teko:001
+          env:
+            - name: USERNAME
+              value: "admin"
+            - name: PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: basic-auth
+                  key: basic-auth-password
+          resources:
+            requests:
+              memory: "250Mi"
+              cpu: "250m"
+            limits:
+              memory: "250Mi"
+              cpu: "250m"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+          volumeMounts:
+          - name: message-file-config
+            mountPath: /tmp/hello.txt
+            subPath: hello.txt
+          securityContext:
+            capabilities:
+              drop:
+                - all
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+
+      volumes:
+        - name: message-file-config
+          configMap:
+            name: message-file

@@ -1,0 +1,14 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+images:
+- name: lilbitsquishy/teko
+  newTag: 001
+resources:
+- deployment.yaml
+- service.yaml
+- secret.yaml
+- configmap.yaml
+- imagePullSecrets.yaml
+- namespace.yaml
+- ingress.yaml
