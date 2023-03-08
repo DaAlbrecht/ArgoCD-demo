@@ -6,4 +6,5 @@ metadata:
 data:
 
   hello.txt: |-
+    TEST:TEKO
     Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis suscipit, felis a auctor fermentum, erat risus lobortis velit, vitae venenatis odio mi ac enim. Praesent dictum metus eget semper pellentesque. Duis euismod feugiat nisi, sit amet rhoncus purus placerat ut. Maecenas vel varius quam, nec finibus ante. Nam elit dui, fermentum ac dui tempus, condimentum rhoncus lectus. Vestibulum et nunc aliquet neque convallis egestas. Duis eu rhoncus nisl.
