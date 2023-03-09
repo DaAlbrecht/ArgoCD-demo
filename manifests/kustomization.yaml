@@ -10,4 +10,4 @@ resources:
 - secret.yaml
 - configmap.yaml
 - namespace.yaml
-- ingress.yaml
+  #- ingress.yaml
